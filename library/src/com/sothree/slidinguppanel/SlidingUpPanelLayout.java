@@ -150,6 +150,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
          * @param slideOffset The new offset of this sliding pane within its range, from 0-1
          */
         public void onPanelSlide(View panel, float slideOffset);
+
+        public void onPanelCollapse(View panel);
         /**
          * Called when a sliding pane becomes slid completely collapsed. The pane may or may not
          * be interactive at this point depending on if it's shown or hidden
@@ -157,6 +159,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
          */
         public void onPanelCollapsed(View panel);
 
+        public void onPanelExpand(View panel);
         /**
          * Called when a sliding pane becomes slid completely expanded. The pane is now guaranteed
          * to be interactive. It may now obscure other views in the layout.
@@ -175,9 +178,19 @@ public class SlidingUpPanelLayout extends ViewGroup {
         @Override
         public void onPanelSlide(View panel, float slideOffset) {
         }
+
+        @Override
+        public void onPanelCollapse(View panel) {
+        }
+
         @Override
         public void onPanelCollapsed(View panel) {
         }
+
+        @Override
+        public void onPanelExpand(View panel) {
+        }
+
         @Override
         public void onPanelExpanded(View panel) {
         }
@@ -288,11 +301,23 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
 
+    void dispatchOnPanelExpand(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelExpand(panel);
+        }
+    }
+
     void dispatchOnPanelExpanded(View panel) {
         if (mPanelSlideListener != null) {
             mPanelSlideListener.onPanelExpanded(panel);
         }
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
+    }
+
+    void dispatchOnPanelCollapse(View panel) {
+        if (mPanelSlideListener != null) {
+            mPanelSlideListener.onPanelCollapse(panel);
+        }
     }
 
     void dispatchOnPanelCollapsed(View panel) {
@@ -650,6 +675,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private boolean expandPane(View pane, int initialVelocity, float mSlideOffset) {
         if (mFirstLayout || smoothSlideTo(mSlideOffset, initialVelocity)) {
             mPreservedExpandedState = true;
+            dispatchOnPanelExpand(pane);
             return true;
         }
         return false;
@@ -658,6 +684,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private boolean collapsePane(View pane, int initialVelocity) {
         if (mFirstLayout || smoothSlideTo(1.f, initialVelocity)) {
             mPreservedExpandedState = false;
+            dispatchOnPanelCollapse(pane);
             return true;
         }
         return false;
