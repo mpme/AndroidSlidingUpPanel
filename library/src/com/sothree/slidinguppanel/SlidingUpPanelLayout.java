@@ -923,6 +923,16 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mPreservedExpandedState = ss.isExpanded;
     }
 
+    @Override
+    protected boolean fitSystemWindows(Rect insets) {
+        int leftPadding = insets.left;
+        int rightPadding = insets.right;
+        int topPadding = insets.top;
+        int bottomPadding = insets.bottom;
+        setPadding(leftPadding, topPadding, rightPadding, bottomPadding);
+        return true;
+    }
+
     private class DragHelperCallback extends ViewDragHelper.Callback {
 
         @Override
