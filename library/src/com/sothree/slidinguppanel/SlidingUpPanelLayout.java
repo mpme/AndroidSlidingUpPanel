@@ -745,10 +745,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     public void hidePane() {
-        if (mSlideableView == null) {
+        if (getChildCount() < 2) {
             return;
         }
-        mSlideableView.setVisibility(View.GONE);
+        View slidingPane = getChildAt(1);
+        slidingPane.setVisibility(View.GONE);
         requestLayout();
     }
 
