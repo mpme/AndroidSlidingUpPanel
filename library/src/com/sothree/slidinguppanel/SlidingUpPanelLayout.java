@@ -20,6 +20,8 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 
 public class SlidingUpPanelLayout extends ViewGroup {
     
@@ -483,8 +485,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mSlideOffset = mCanSlide && mPreservedExpandedState ? 0.f : 1.f;
         }
 
+        View child;
         for (int i = 0; i < childCount; i++) {
-            final View child = getChildAt(i);
+            child = getChildAt(i);
 
             if (child.getVisibility() == GONE) {
                 continue;
@@ -718,7 +721,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     public boolean expandPane(float mSlideOffset) {
         if (!isPaneVisible()) {
-            showPane();
+            showPane(true);
         }
         return expandPane(mSlideableView, 0, mSlideOffset);
     }
@@ -762,22 +765,39 @@ public class SlidingUpPanelLayout extends ViewGroup {
         return slidingPane.getVisibility() == View.VISIBLE;
     }
 
-    public void showPane() {
+    public void showPane(boolean fadeIn) {
         if (getChildCount() < 2) {
             return;
         }
         View slidingPane = getChildAt(1);
+        if (slidingPane.getVisibility() == View.VISIBLE) {
+            return;
+        }
+
         slidingPane.setVisibility(View.VISIBLE);
-        requestLayout();
+        if (fadeIn) {
+            Animation animation = new AlphaAnimation(0f, 1f);
+            animation.setDuration(300);
+            slidingPane.startAnimation(animation);
+        }
     }
 
-    public void hidePane() {
+    public void hidePane(boolean fadeOut) {
         if (getChildCount() < 2) {
             return;
         }
-        View slidingPane = getChildAt(1);
-        slidingPane.setVisibility(View.GONE);
-        requestLayout();
+        final View slidingPane = getChildAt(1);
+        if (slidingPane.getVisibility() == View.GONE) {
+            return;
+        }
+
+        if (fadeOut) {
+            Animation animation = new AlphaAnimation(1f, 0f);
+            animation.setDuration(300);
+            slidingPane.startAnimation(animation);
+        } else {
+            slidingPane.setVisibility(View.GONE);
+        }
     }
 
     private void onPanelDragged(int newTop) {
